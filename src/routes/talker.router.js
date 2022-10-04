@@ -6,6 +6,7 @@ const fs = require('fs/promises');
 
 const HTTP_OK_STATUS = 200;
 const HTTP_NOT_FOUND_STATUS = 404;
+const HTTP_CREATED_STATUS = 201;
 const TALKER_FILE = './src/talker.json';
 
 talkerRouter.get('/talker', async (_req, res) => {
@@ -25,5 +26,25 @@ talkerRouter.get('/talker/:id', async (req, res) => {
       .status(HTTP_NOT_FOUND_STATUS)
       .json({ message: 'Pessoa palestrante não encontrada' });
   });
+
+  talkerRouter.post(
+    '/talker',
+    async (req, res) => {
+      const talkers = JSON.parse(await fs.readFile(TALKER_FILE));
+  
+      const { name, age, talk } = req.body;
+  
+      const addNewTalker = {
+        id: talkers.length + 1,
+        name,
+        age,
+        talk,
+      };
+  
+      talkers.push(addNewTalker);
+      await fs.writeFile(TALKER_FILE, JSON.stringify(talkers));
+      res.status(HTTP_CREATED_STATUS).json(addNewTalker);
+    },
+  );
 
 module.exports = talkerRouter;
