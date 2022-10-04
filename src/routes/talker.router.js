@@ -100,7 +100,7 @@ talkerRouter.delete(
       talkers.splice(index, 1);
     }
     await fs.writeFile(TALKER_FILE, JSON.stringify(talkers));
-    res.status(HTTP_NO_CONTENT_STATUS).end();
+    res.status(HTTP_NO_CONTENT_STATUS).json({ message: 'Deletado com sucesso!' });
   },
 );
 
