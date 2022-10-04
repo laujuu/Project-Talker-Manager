@@ -62,21 +62,30 @@ talkerRouter.post(
   },
 );
 
-talkerRouter.put('/talker/:id', async (req, res) => {
-  const { id } = req.params;
-  const { name, age, talk } = req.body;
-  const talkers = JSON.parse(await fs.readFile(TALKER_FILE));
+talkerRouter.put(
+  '/talker/:id',
+  tokenValidation,
+  nameValidation,
+  ageValidation,
+  talkValidation,
+  watchedAtValidation,
+  rateValidation,
+  async (req, res) => {
+    const { id } = req.params;
+    const { name, age, talk } = req.body;
+    const talkers = JSON.parse(await fs.readFile(TALKER_FILE));
 
-  const editTalker = { id: +id, name, age, talk };
+    const editTalker = { id: +id, name, age, talk };
 
-  const talkerID = talkers.findIndex((talker) => +talker.id === +id);
-  if (!talkerID) {
-    return res.status(404).send('Talker Not Found!');
-  }
+    const talkerID = talkers.findIndex((talker) => +talker.id === +id);
+    if (!talkerID) {
+      return res.status(HTTP_NOT_FOUND_STATUS).send('Talker Not Found!');
+    }
 
-  talkers[talkerID] = editTalker;
-  await fs.writeFile(TALKER_FILE, JSON.stringify(talkers));
-  res.status(HTTP_OK_STATUS).json(editTalker);
-});
+    talkers[talkerID] = editTalker;
+    await fs.writeFile(TALKER_FILE, JSON.stringify(talkers));
+    res.status(HTTP_OK_STATUS).json(editTalker);
+  },
+);
 
 module.exports = talkerRouter;
