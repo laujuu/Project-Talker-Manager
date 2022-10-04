@@ -16,6 +16,7 @@ const {
 const HTTP_OK_STATUS = 200;
 const HTTP_NOT_FOUND_STATUS = 404;
 const HTTP_CREATED_STATUS = 201;
+const HTTP_NO_CONTENT_STATUS = 204;
 const TALKER_FILE = './src/talker.json';
 
 talkerRouter.get('/talker', async (_req, res) => {
@@ -85,6 +86,21 @@ talkerRouter.put(
     talkers[talkerID] = editTalker;
     await fs.writeFile(TALKER_FILE, JSON.stringify(talkers));
     res.status(HTTP_OK_STATUS).json(editTalker);
+  },
+);
+
+talkerRouter.delete(
+  '/talker/:id', tokenValidation, async (req, res) => {
+    const { id } = req.params;
+    const talkers = JSON.parse(await fs.readFile(TALKER_FILE));
+
+    const talkerID = talkers.find((talker) => talker.id === Number(id));
+    if (talkerID) {
+      const index = talkers.indexOf(talkerID);
+      talkers.splice(index, 1);
+    }
+    await fs.writeFile(TALKER_FILE, JSON.stringify(talkers));
+    res.status(HTTP_NO_CONTENT_STATUS).end();
   },
 );
 
