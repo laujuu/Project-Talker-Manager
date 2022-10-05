@@ -19,6 +19,16 @@ const HTTP_CREATED_STATUS = 201;
 const HTTP_NO_CONTENT_STATUS = 204;
 const TALKER_FILE = './src/talker.json';
 
+talkerRouter.get(
+  '/talker/search', tokenValidation, async (req, res) => {
+    const { q } = req.query;
+    const talkers = JSON.parse(await fs.readFile(TALKER_FILE));
+
+    const filteredTalker = talkers.filter((talker) => talker.name.includes(q));
+    return res.status(HTTP_OK_STATUS).json(filteredTalker);
+  },
+);
+
 talkerRouter.get('/talker', async (_req, res) => {
   const talkers = await fs.readFile(TALKER_FILE);
   if (talkers.length === 0) return res.status(HTTP_OK_STATUS).send([]);
